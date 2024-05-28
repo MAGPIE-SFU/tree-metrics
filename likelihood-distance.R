@@ -111,28 +111,28 @@ y.lab <- TeX("$|L(T_i)-L(T_j)|$")
 rsv.p <- ggplot(rsv.like.dist,aes(x=diff,y=like))+
   geom_point(alpha=0.025, color =  "#1F78B4") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "d. RSV")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 hcv.p <- ggplot(hcv.like.dist,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#1B9E77") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "c. HCV")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 alpha.p <- ggplot(alpha.like.dist,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#E41A1C") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "a. Alpha")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 delta.p <- ggplot(delta.like.dist,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#7570B3") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "b. Delta")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
@@ -189,28 +189,28 @@ ggsave(filename = "like-corr-all.png",dpi=300,width = 6,height = 6)
 rsv.middle <- ggplot(rsv.like.dist.middle,aes(x=diff,y=like))+
   geom_point(alpha=0.025, color =  "#1F78B4") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "d. RSV")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 hcv.middle <- ggplot(hcv.like.dist.middle,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#1B9E77") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "c. HCV")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 alpha.middle <- ggplot(alpha.like.dist.middle,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#E41A1C") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "a. Alpha")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 delta.middle <- ggplot(delta.like.dist.middle,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#7570B3") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "b. Delta")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
@@ -221,28 +221,28 @@ ggsave(,filename = "likedist-middle.png",dpi=300,width=12,height = 12)
 rsv.last <- ggplot(rsv.like.dist.last,aes(x=diff,y=like))+
   geom_point(alpha=0.025, color =  "#1F78B4") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "d. RSV")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 hcv.last <- ggplot(hcv.like.dist.last,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#1B9E77") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "c. HCV")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 alpha.last <- ggplot(alpha.like.dist.last,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#E41A1C") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "a. Alpha")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
 delta.last <- ggplot(delta.like.dist.last,aes(x=diff,y=like,group=metric))+
   geom_point(alpha=0.025, color = "#7570B3") +
   theme_bw(base_size = 12) +
-  labs(y=y.lab,x=x.lab)+
+  labs(y=y.lab,x=x.lab,subtitle = "b. Delta")+
   facet_wrap(metric~.,scales = "free_x",ncol = 3) +
   theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
 
@@ -250,3 +250,101 @@ ggarrange(alpha.last,delta.last,hcv.last,rsv.last)
 
 ggsave(,filename = "likedist-last.png",dpi=300,width=12,height = 12)
 
+
+#### Histograms #######
+rsv.last.hist <- ggplot(rsv.like.dist.last,aes(x=diff))+
+  geom_histogram(alpha=0.4, color =  "#1F78B4", fill = "#1F78B4") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "d. RSV")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+hcv.last.hist <- ggplot(hcv.like.dist.last,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#1B9E77", fill= "#1B9E77") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "c. HCV")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+alpha.last.hist <- ggplot(alpha.like.dist.last,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#E41A1C", fill="#E41A1C") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "a. Alpha")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+delta.last.hist <- ggplot(delta.like.dist.last,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#7570B3", fill="#7570B3") +
+  theme_bw(base_size = 12) +
+  labs(y=y.lab,x=x.lab,subtitle = "b. Delta")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+ggarrange(alpha.last.hist,delta.last.hist,hcv.last.hist,rsv.last.hist)
+
+ggsave(,filename = "dist-last-hist.png",dpi=300,width=12,height = 12)
+
+
+rsv.middle.hist <- ggplot(rsv.like.dist.middle,aes(x=diff))+
+  geom_histogram(alpha=0.4, color =  "#1F78B4", fill = "#1F78B4") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "d. RSV")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+hcv.middle.hist <- ggplot(hcv.like.dist.middle,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#1B9E77", fill= "#1B9E77") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "c. HCV")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+alpha.middle.hist <- ggplot(alpha.like.dist.middle,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#E41A1C", fill="#E41A1C") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "a. Alpha")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+delta.middle.hist <- ggplot(delta.like.dist.middle,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#7570B3", fill="#7570B3") +
+  theme_bw(base_size = 12) +
+  labs(y=y.lab,x=x.lab,subtitle = "b. Delta")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+ggarrange(alpha.middle.hist,delta.middle.hist,hcv.middle.hist,rsv.middle.hist)
+
+ggsave(,filename = "dist-middle-hist.png",dpi=300,width=12,height = 12)
+
+rsv.hist <- ggplot(rsv.like.dist,aes(x=diff))+
+  geom_histogram(alpha=0.4, color =  "#1F78B4", fill = "#1F78B4") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "d. RSV")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+hcv.hist <- ggplot(hcv.like.dist,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#1B9E77", fill= "#1B9E77") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "c. HCV")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+alpha.hist <- ggplot(alpha.like.dist,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#E41A1C", fill="#E41A1C") +
+  theme_bw(base_size = 12) +
+  labs(y="Count",x=x.lab,subtitle = "a. Alpha")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+delta.hist <- ggplot(delta.like.dist,aes(x=diff,group=metric))+
+  geom_histogram(alpha=0.4, color = "#7570B3", fill="#7570B3") +
+  theme_bw(base_size = 12) +
+  labs(y=y.lab,x=x.lab,subtitle = "b. Delta")+
+  facet_wrap(metric~.,scales = "free_x",ncol = 3) +
+  theme(axis.text.x = element_text(angle = 35),panel.spacing = unit(0.2, "lines")) 
+
+ggarrange(alpha.hist,delta.hist,hcv.hist,rsv.hist)
+
+ggsave(,filename = "dist-first-hist.png",dpi=300,width=12,height = 12)
