@@ -6,7 +6,7 @@ This repository contains code to reproduce the analyses in Jones et al. (2024) "
 - MDS (Figure 3): `dist_mds_corr.R`
 - Gisaid information for the alpha and delta data sets: `Cov2_GISAID_information.xlsx`
 
-## Additional information 
+## RWTY Fork 
 We forked the RWTY R package to add additional metrics to the approximate and pseudo-ESS functions in RWTY. We have also added the ability to use any user-defined distance metric, where a
 user-defined metric can be any function which takes two phylogenetic trees (from ape) as
 input and outputs a number. 
