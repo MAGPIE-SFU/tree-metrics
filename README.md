@@ -7,6 +7,7 @@ This repository contains code to reproduce the analyses in Jones et al. (2024) "
 - Gisaid information for the alpha and delta data sets: `Cov2_GISAID_information.xlsx`
 - ESS experiments `tree_ess.R`
 - Plots for ESS (Figures 1 and 2) `plot_ess.R`
+- Real-valued Toy data `real_data.R`
 
 ## RWTY Fork 
 We forked the RWTY R package to add additional metrics to the approximate and pseudo-ESS functions in RWTY. We have also added the ability to use any user-defined distance metric, where a
