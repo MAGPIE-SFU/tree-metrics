@@ -204,11 +204,11 @@ delta.p.first <- ggplot(delta.first,aes(x=diff,y=like,group=metric))+
 
 library(ggpubr)
 first.plots <- ggarrange(alpha.p.first,delta.p.first,hcv.p.first,rsv.p.first)
-ggsave(filename = "likedist_plot_first.svg",
+ggsave(filename = "likedist_plot_first.png",
        plot = first.plots,
        width = 10, height = 15,   
        units = "in",
-       device = "svg")
+       device = "png")
 
 
 ### MIDDLE 50 ####
@@ -350,11 +350,11 @@ delta.p.mid <- ggplot(delta.mid, aes(x=diff, y=like, group=metric)) +
 
 library(ggpubr)
 mid.plots <- ggarrange(alpha.p.mid, delta.p.mid, hcv.p.mid, rsv.p.mid)
-ggsave(filename = "likedist_plot_mid.svg",
+ggsave(filename = "likedist_plot_mid.png",
        plot = mid.plots,
        width = 10, height = 15,   
        units = "in",
-       device = "svg")
+       device = "png")
 
 
 #### LAST 50 #####
@@ -497,8 +497,8 @@ combined.plot <- ggarrange(alpha.p.last, delta.p.last, hcv.p.last, rsv.p.last,
                            ncol = 2, nrow = 2) 
 
 # save as SVG
-ggsave(filename = "likedist_plot_last.svg",
+ggsave(filename = "likedist_plot_last.png",
        plot = combined.plot,
        width = 10, height = 15,   
        units = "in",
-       device = "svg")
+       device = "png")
