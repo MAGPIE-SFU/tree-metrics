@@ -121,17 +121,3 @@ ggplot( aes(y = V1, x = V2, color=Group)) +
 ggsave(file="mdsplots-2026.png",width=9,height=9,dpi=800,bg="white")
 
 
-## correlation bar plot 
-RFpair=wRFpair=KFpair=PDpair=JRFpair=KCpair=SPRpair=MSpair= NNIpair=BHVpair=rep(NA,398)
-for (i in 1:399) {
-  RFpair[i] <- phangorn::RF.dist(tree.sample[[i]],tree.sample[[i+1]])
-  wRFpair[i] <- phangorn::wRF.dist(tree.sample[[i]],tree.sample[[i+1]])
-  KFpair[i] <- phangorn::KF.dist(tree.sample[[i]],tree.sample[[i+1]])
-  PDpair[i] <- phangorn::path.dist(tree.sample[[i]],tree.sample[[i+1]])
-  JRFpair[i] <- TreeDist::JaccardRobinsonFoulds(tree.sample[[i]],tree.sample[[i+1]])
-  KCpair[i] <- TreeDist::KendallColijn(tree.sample[[i]],tree.sample[[i+1]])
-  SPRpair[i] <- TreeDist::SPRDist(tree.sample[[i]],tree.sample[[i+1]])
- MSpair[i] <- TreeDist::MatchingSplitDistance(tree.sample[[i]],tree.sample[[i+1]])
-  NNIpair[i] <- TreeDist::NNIDist(tree.sample[[i]],tree.sample[[i+1]])
-  BHVpair[i] <- distory::dist.multiPhylo(tree.sample[[i]],tree.sample[[i+1]])
-}
