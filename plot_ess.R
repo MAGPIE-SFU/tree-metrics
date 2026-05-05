@@ -38,14 +38,26 @@ blank.colour.scale <- scale_colour_manual(
 metrics <- c("RF", "WRF", "JRF", "IRF", "MSD", "KF", "PD", "KC", "BHV", "Trip", "Quart", "SPR", "NNI", "RNNI")
 metric.labels <- c("RF", "wRF", "JRF", "IRF", "MS", "KF", "PD", "KC", "BHV", "Trip", "Quart", "SPR", "NNI", "RNNI")
 
-plot_comb_ess <- function(pseudo.ess, approx.ess, data.labels, filter = NA, ymax = NA, facet.scales = 'free', ncol = NULL) {
+plot_comb_ess <- function(pseudo.ess, approx.ess, frechet.ess, data.labels, filter = NA, ymin = 0, ymax = NA, facet.scales = 'free', ncol = NULL, alt = NULL) {
   if (!is.na(filter)[1]) {
     pseudo.ess <- filter(pseudo.ess, dataset %in% filter) %>% mutate(dataset = factor(dataset, levels = filter))
     approx.ess <- filter(approx.ess, dataset %in% filter) %>% mutate(dataset = factor(dataset, levels = filter))
-    data.labels <- data.labels[names(data.labels) %in% filter]
+    frechet.ess <- filter(frechet.ess, dataset %in% filter) %>% mutate(dataset = factor(dataset, levels = filter))
+    data.labels <- data.labels[filter]
   }
   
-  ggplot(
+  if (!is.null(alt)) {
+    pseudo.ess <- left_join(pseudo.ess, alt, by = "dataset")
+    approx.ess <- left_join(approx.ess, alt, by = "dataset")
+    frechet.ess <- left_join(frechet.ess, alt, by = "dataset")
+    form <- as.formula("data ~ type")
+    labs <- 'label_value'
+  } else {
+    form <- as.formula(". ~ dataset")
+    labs <- labeller(dataset = data.labels)
+  }
+  
+  p <- ggplot(
     pseudo.ess,
     aes(x = dist, y = Chain.1)#, colour = dataset)
   ) +
@@ -57,9 +69,16 @@ plot_comb_ess <- function(pseudo.ess, approx.ess, data.labels, filter = NA, ymax
       size = 3,
       show.legend = FALSE
     ) +
+    geom_point(
+      data = frechet.ess,
+      aes(x = dist, y = frechet, colour = small),
+      shape = 4,
+      size = 3,
+      show.legend = FALSE
+    ) +
     geom_text(data = approx.ess, aes(x = dist, label = my.label), y = 100, colour = 'red') +
-    facet_wrap(. ~ dataset, scales = facet.scales, labeller = labeller(dataset = data.labels), ncol = ncol) +
-    labs(x = "Metric", y = "Estimated ESS") +
+    facet_wrap(form, scales = facet.scales, labeller = labs, ncol = ncol) +
+    ggplot2::labs(x = "Metric", y = "Estimated ESS") +
     scale_x_discrete(
       breaks = metrics,
       limits = metrics,
@@ -68,15 +87,24 @@ plot_comb_ess <- function(pseudo.ess, approx.ess, data.labels, filter = NA, ymax
     ) +
     scale_colour_manual(breaks = c(TRUE, FALSE), limits = c(TRUE, FALSE), values = c("blue", "black")) +
     theme_bw() +
-    lims(y = c(0, ymax)) +
     my.theme
+  
+  if (!is.na(ymin) || !is.na(ymax)) {
+    p + lims(y = c(ymin, ymax))
+  } else {
+    p
+  }
 }
 
 options("readr.show_col_types" = FALSE, "readr.show_progress" = FALSE)
 
 prefix <- c(
   alpha="Ireland_alpha", delta="Ireland_delta", hcv="hcv", rsv = 'RSV2',
-  `285.1000` = "285.1000", `285` = "285", Cratopus = "Cratopus",
+  alpha_short="Ireland_alpha_short", delta_short="Ireland_delta_short",
+  alpha.short="Ireland_alpha.short", delta.short="Ireland_delta.short", hcv.short="hcv.short", rsv.short = 'RSV2.short',
+  alpha.low="Ireland_alpha_clean.low", delta.low="Ireland_delta_clean.low", hcv.low="hcv.low", rsv.low = 'RSV2.low',
+  alpha.finer="Ireland_alpha_clean.finer", delta.finer="Ireland_delta_clean.finer", hcv.finer="hcv.finer", rsv.finer = 'RSV2.finer',
+  `285` = "285", Cratopus = "Cratopus",
   random.1000 = 'random',
   random.copy.1 = 'random_copy_1', random.copy.4 = 'random_copy_4',
   random.copy.vary9 = 'random_copy_vary9', random.copy.vary2 = 'random_copy_vary2', random.copy.vary5 = 'random_copy_vary5',
@@ -142,7 +170,11 @@ if (pres) {
 if (pres) {
   data.name <- c(
     "Alpha", "Delta", "HCV", "RSV",
-    "Weevil (1000)", "Weevil (MrBayes)", "Weevil (BEAST)",
+    "Alpha", "Delta",
+    "Alpha", "Delta", "HCV", "RSV",
+    "Alpha", "Delta", "HCV", "RSV",
+    "Alpha", "Delta", "HCV", "RSV",
+    "Weevil (MrBayes)", "Weevil (BEAST)",
     "Random trees",
     "Random trees (2 copies)", "Random trees (5 copies)",
     "Random trees (Poisson p=0.9 copies)", "Random trees (Poisson p=0.5 copies)", "Random trees (Poisson p=0.2 copies)",
@@ -161,7 +193,11 @@ if (pres) {
 } else {
   data.name <- c(
     "Alpha", "Delta", "HCV", "RSV",
-    "Weevil (1000)", "Weevil (MrBayes)", "Weevil (BEAST)",
+    "Alpha", "Delta",
+    "Alpha", "Delta", "HCV", "RSV",
+    "Alpha", "Delta", "HCV", "RSV",
+    "Alpha", "Delta", "HCV", "RSV",
+    "Weevil (MrBayes)", "Weevil (BEAST)",
     "Toy",
     "Toy-copy-2", "Toy-copy-5",
     "Toy-copyvary-0.9", "Toy-copyvary-0.5", "Toy-copyvary-0.2",
@@ -186,6 +222,16 @@ pseudo.ess <- paste0("stats/", prefix, ".psuedoess.csv") %>%
   select(-id) %>%
   filter(dist %in% metrics)
 
+frechet.ess <- paste0("stats/", prefix, ".frechetess.csv") %>%
+  lapply(read_csv) %>%
+  bind_rows(.id = 'id') %>%
+  right_join(prefix.t, ., by = "id") %>%
+  select(-id) %>%
+  filter(dist %in% metrics) %>%
+  group_by(dataset) %>%
+  mutate(small = frechet < median(frechet)) %>%
+  ungroup()
+
 approx.ess <- paste0("stats/", prefix, ".approxess.csv") %>%
   lapply(read_csv) %>%
   bind_rows(.id = 'id') %>%
@@ -208,60 +254,91 @@ approx.ess <- paste0("stats/", prefix, ".approxess.csv") %>%
     )
   )
 
-if (FALSE) {
-auto.corr <- paste0("stats/", prefix, ".autocorr.csv") %>%
-  lapply(read_csv) %>%
-  bind_rows(.id = 'id') %>%
-  right_join(prefix.t, ., by = "id") %>%
-  select(-id) %>%
-  group_by(dataset, dist) %>%
-  mutate(scaled.distance = topo.distance / max(topo.distance))
-
-approx.ess.p <- ggplot(
-  approx.ess,
-  aes(x = dist, y = approx.ess, colour = dist)
-) +
-  geom_point(show.legend = FALSE) +
-  facet_wrap(. ~ dataset, scales = 'free', labeller = labeller(dataset = data.name)) +
-  labs(x = "Metric", y = "Approximate ESS") +
-  theme_bw() +
-  lims(y = c(0, NA)) +
-  theme(axis.text.x = element_text(angle = 30, hjust = .75))
-
-pseudo.ess.p <- ggplot(
-  pseudo.ess,
-  aes(x = dist, y = Chain.1, colour = dist)
-) +
-  geom_boxplot(show.legend = FALSE) +
-  facet_wrap(. ~ dataset, scales = 'free', labeller = labeller(dataset = data.name)) +
-  labs(x = "Metric", y = "Pseudo ESS") +
-  theme_bw() +
-  lims(y = c(0, NA)) +
-  theme(axis.text.x = element_text(angle = 30, hjust = .75))
-  
-}
-ess.comb.p <-plot_comb_ess(pseudo.ess, approx.ess, data.labels = data.name)
+#ess.comb.p <-plot_comb_ess(pseudo.ess, approx.ess, frechet.ess, data.labels = data.name)
 
 ess.comb.weevil.p <- plot_comb_ess(
   pseudo.ess,
   approx.ess,
+  frechet.ess,
   data.labels = data.name,
   filter = c("285", "Cratopus")
-) +
+) -
   geom_hline(
   aes(yintercept = y),
-  data = tibble(y = c(30004, 2501), dataset = c("285", "Cratopus")),
+  data = tibble(y = c(7502, 2501), dataset = c("285", "Cratopus")),
   linetype = 'dashed',
   colour = 'gray',
   linewidth = 1
 )
 
+comb.all.filt <- c("Ireland_alpha_short", "Ireland_delta_short", "hcv.short", "RSV2.short", "Ireland_alpha_clean.low", "Ireland_delta_clean.low", "hcv.low", "RSV2.low", "Ireland_alpha", "Ireland_delta", "hcv", "RSV2")
+comb.alt <- tibble(
+  dataset = comb.all.filt,
+  data = rep(c("Alpha", "Delta", "HCV", "RSV"), 3),
+  type =factor(c(rep("Short", 4), rep("Middle", 4), rep("Long", 4)), levels = c("Short", "Middle", "Long")),
+  y = c(4501, 4501, 901, 1801, 2000, 2000, 2000, 2000, 1801, 1801, 1801, 1801)
+)
+
+ess.comb.emp.all.p <- plot_comb_ess(
+  pseudo.ess,
+  approx.ess,
+  frechet.ess,
+  data.labels = data.name,
+  filter = comb.all.filt,
+  alt = comb.alt,
+  ncol = 3
+) -
+  geom_hline(
+    aes(yintercept = y),
+    data = comb.alt,
+    linetype = 'dashed',
+    colour = 'gray',
+    linewidth = 1
+  )
+
+ess.comb.emp.low.p <- plot_comb_ess(
+  pseudo.ess,
+  approx.ess,
+  frechet.ess,
+  data.labels = data.name,
+  filter = c("Ireland_alpha_clean.low", "Ireland_delta_clean.low", "hcv.low", "RSV2.low")
+) -
+  geom_hline(
+    aes(yintercept = y),
+    data = tibble(
+      y = c(2000, 2000, 2000, 2000),
+      dataset = factor(c("Ireland_alpha_clean.low", "Ireland_delta_clean.low", "hcv.low", "RSV2.low"))
+    ),
+    linetype = 'dashed',
+    colour = 'gray',
+    linewidth = 1
+  )
+
+ess.comb.emp.finer.p <- plot_comb_ess(
+  pseudo.ess,
+  approx.ess,
+  frechet.ess,
+  data.labels = data.name,
+  filter = c("Ireland_alpha_clean.finer", "Ireland_delta_clean.finer", "hcv.finer", "RSV2.finer")
+) -
+  geom_hline(
+    aes(yintercept = y),
+    data = tibble(
+      y = c(18002, 18002, 18002, 18002),
+      dataset = factor(c("Ireland_alpha_clean.finer", "Ireland_delta_clean.finer", "hcv.finer", "RSV2.finer"))
+    ),
+    linetype = 'dashed',
+    colour = 'gray',
+    linewidth = 1
+  )
+
 ess.comb.emp.p <- plot_comb_ess(
   pseudo.ess,
   approx.ess,
+  frechet.ess,
   data.labels = data.name,
   filter = c("Ireland_alpha", "Ireland_delta", "hcv", "RSV2") #, "285")
-) +
+) -
 #  scale_colour_manual(
 #    name = "",
 #    breaks = c("Ireland_alpha", "Ireland_delta", "hcv", "RSV2"),
@@ -272,7 +349,36 @@ ess.comb.emp.p <- plot_comb_ess(
 #  ) +
   geom_hline(
     aes(yintercept = y),
-    data = tibble(y = c(4501, 4501, 901, 1801), dataset = factor(c("Ireland_alpha", "Ireland_delta", "hcv", "RSV2"))), #, 30004) //, "285"))),
+    data = tibble(
+        y = c(1801, 1801, 1801, 1801),
+        dataset = factor(c("Ireland_alpha", "Ireland_delta", "hcv", "RSV2"))
+      ), #, 30004) //, "285"))), #c(4501, 4501, 901, 1801)
+    linetype = 'dashed',
+    colour = 'gray',
+    linewidth = 1
+  )
+
+ess.comb.emp.short.p <- plot_comb_ess(
+  pseudo.ess,
+  approx.ess,
+  frechet.ess,
+  data.labels = data.name,
+  filter = c("Ireland_alpha.short", "Ireland_delta.short", "hcv.short", "RSV2.short") #, "285")
+) -
+  #  scale_colour_manual(
+  #    name = "",
+  #    breaks = c("Ireland_alpha", "Ireland_delta", "hcv", "RSV2"),
+  #    limits = c("Ireland_alpha", "Ireland_delta", "hcv", "RSV2"),
+  #    labels = c("Alpha", "Delta", "HCV", "RSV"),
+  #    values = c("#E41A1C", "#7570B3", "#1B9E77", "#1F78B4"),
+  #    guide = 'none'
+  #  ) +
+  geom_hline(
+    aes(yintercept = y),
+    data = tibble(
+      y = c(4501, 4501, 901, 1801),
+      dataset = factor(c("Ireland_alpha.short", "Ireland_delta.short", "hcv.short", "RSV2.short"))
+    ), #, 30004) //, "285"))), #c(4501, 4501, 901, 1801)
     linetype = 'dashed',
     colour = 'gray',
     linewidth = 1
@@ -292,6 +398,7 @@ toy.filter <- c(
 ess.comb.toy.p <- plot_comb_ess(
   pseudo.ess,
   approx.ess,
+  frechet.ess,
   data.labels = data.name,
   filter = toy.filter,
   facet.scales = 'fixed'
@@ -302,12 +409,13 @@ ess.comb.toy.p <- plot_comb_ess(
     data = filter(theor.ess, dataset %in% toy.filter),
     linetype = 'solid',
     colour = 'gray',
-    linewidth = 2
+    linewidth = 2,
   )
 
 ess.comb.nni.p <- plot_comb_ess(
   pseudo.ess,
   approx.ess,
+  frechet.ess,
   data.labels = data.name,
   filter =  if (pres)  {
     c('nni_1', 'nni_10', 'nni_100', 'nni_1000')
@@ -315,13 +423,15 @@ ess.comb.nni.p <- plot_comb_ess(
     c('nni_1', 'nni_10', 'nni_100', 'nni_1000', 'nni_10000')
   },
   facet.scales = 'free',
-  ncol = ifelse(pres, 1, 3)
+  ncol = ifelse(pres, 1, 3),
+  ymin = NA
 ) #+
 #  blank.colour.scale
 
 ess.comb.spr.p <- plot_comb_ess(
   pseudo.ess,
   approx.ess,
+  frechet.ess,
   data.labels = data.name,
   filter =  if (pres)  {
       c('spr_1', 'spr_10', 'spr_100', 'spr_1000')
@@ -329,43 +439,19 @@ ess.comb.spr.p <- plot_comb_ess(
       c('spr_1', 'spr_10', 'spr_100', 'spr_1000', 'spr_10000')
     },
   facet.scales = 'free',
-  ncol = ifelse(pres, 1, 3)
+  ncol = ifelse(pres, 1, 3),
+  ymin = NA
 )# +
 # blank.colour.scale 
-
-if (FALSE) {
-autocorr.p <- ggplot(
-  auto.corr,
-  aes(x = sampling.interval, y = topo.distance, colour = dist, group = dist)
-) + 
-  geom_line() + 
-  facet_wrap(. ~ dataset, scales = 'free', labeller = labeller(dataset = data.name)) + 
-  labs(x = "Sampling Interval", y = "Average Pairwise Distance", colour = "Metric") + 
-  lims(y = c(0, NA)) +
-  theme_bw()
-
-autocorr.scaled.p <- ggplot(
-  auto.corr,
-  aes(x = sampling.interval, y = scaled.distance, colour = dist, group = dist)
-) + 
-  geom_line(alpha = 0.75) + 
-  facet_wrap(. ~ dataset, scales = 'free', labeller = labeller(dataset = data.name)) + 
-  labs(x = "Sampling Interval", y = "Average Pairwise Distance (Scaled)", colour = "Metric") + 
-  lims(y = c(0, NA)) +
-  theme_bw()
-
-
-my_ggsave(approx.ess.p, "plots/approx_ess.pdf")
-my_ggsave(pseudo.ess.p, "plots/pseudo_ess.pdf")
-my_ggsave(ess.comb.p, "plots/ess_comb.pdf")
-my_ggsave(autocorr.p, "plots/dist_topo.pdf")
-my_ggsave(autocorr.scaled.p, "plots/dist_scaled_topo.pdf")
-}
 
 postfix = ifelse(pres, "_pres", "")
 
 my_ggsave(ess.comb.weevil.p, paste0("plots/ess_comb_weevil", postfix, ".pdf"), width = 6, height = 3)
+my_ggsave(ess.comb.emp.all.p, paste0("plots/ess_comb_emp_all", postfix, ".pdf"), width = 9, height = 12)
 my_ggsave(ess.comb.emp.p, paste0("plots/ess_comb_emp", postfix, ".pdf"), width = 6)
+my_ggsave(ess.comb.emp.short.p, paste0("plots/ess_comb_emp_short", postfix, ".pdf"), width = 6)
+my_ggsave(ess.comb.emp.low.p, paste0("plots/ess_comb_emp_low", postfix, ".pdf"), width = 6)
+my_ggsave(ess.comb.emp.finer.p, paste0("plots/ess_comb_emp_finer", postfix, ".pdf"), width = 6)
 my_ggsave(ess.comb.toy.p, paste0("plots/ess_comb_toy", postfix, ".pdf"))
 my_ggsave(ess.comb.nni.p, paste0("plots/ess_comb_nni", postfix, ".pdf"), width = ifelse(pres, 3, 9), height = ifelse(pres, 10.66, 5.33))
 my_ggsave(ess.comb.spr.p, paste0("plots/ess_comb_spr", postfix, ".pdf"), width = ifelse(pres, 3, 9), height = ifelse(pres, 10.66, 5.33))
