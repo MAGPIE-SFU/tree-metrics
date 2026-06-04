@@ -35,7 +35,7 @@ blank.colour.scale <- scale_colour_manual(
   guide = 'none'
 )
 
-metrics <- c("RF", "WRF", "JRF", "IRF", "MSD", "KF", "PD", "KC", "BHV", "Trip", "Quart", "SPR", "NNI", "RNNI")
+metrics <- c("RF", "WRF", "JRF", "IRF", "MSD", "KF", "PD", "KC", "BHV", "Trip", "Quart", "SPR", "NNIup", "RNNI")
 metric.labels <- c("RF", "wRF", "JRF", "IRF", "MS", "KF", "PD", "KC", "BHV", "Trip", "Quart", "SPR", "NNI", "RNNI")
 
 plot_comb_ess <- function(pseudo.ess, approx.ess, frechet.ess, data.labels, filter = NA, ymin = 0, ymax = NA, facet.scales = 'free', ncol = NULL, alt = NULL) {
@@ -221,6 +221,14 @@ pseudo.ess <- paste0("stats/", prefix, ".psuedoess.csv") %>%
   right_join(prefix.t, ., by = "id") %>%
   select(-id) %>%
   filter(dist %in% metrics)
+
+pseudo.median.ess <- pseudo.ess %>%
+  group_by(dataset, dist) %>%
+  summarize(pseudo = median(Chain.1)) %>%
+  ungroup() %>%
+  group_by(dataset) %>%
+  mutate(small = pseudo < median(pseudo)) %>%
+  ungroup()
 
 frechet.ess <- paste0("stats/", prefix, ".frechetess.csv") %>%
   lapply(read_csv) %>%
@@ -444,6 +452,55 @@ ess.comb.spr.p <- plot_comb_ess(
 )# +
 # blank.colour.scale 
 
+# Summary "Table"
+ess.sum.emp <- full_join(
+  pseudo.median.ess,
+  frechet.ess,
+  by = c("dataset", "dist"),
+  suffix = c(".pseudo", ".frechet")
+) %>%
+  full_join(
+    approx.ess,
+    by = c("dataset", "dist")
+  ) %>%
+  mutate(small.approx = small) %>%
+  select(-small) %>%
+  filter(dataset %in% c("Ireland_alpha_short", "Ireland_delta_short", "hcv.short", "RSV2.short", "Cratopus")) %>%
+  pivot_longer(
+    cols = c("small.pseudo", "small.frechet", "small.approx"),
+    names_to = "method",
+    values_to = "small",
+    names_prefix = "small."
+  ) %>%
+  select(dataset, dist, method, small) %>%
+  group_by(method, dist) %>%
+  summarize(low = sum(small))
+
+ess.sum.emp.p <- ggplot(ess.sum.emp, aes(x = method, y = dist, fill = 5 - low)) +
+  geom_tile() +
+  scale_fill_gradient2(
+    name = "Datasets higher",
+    limits = c(0, 5),
+    low = "blue", 
+    high = "red",
+    midpoint = 2.5
+  ) +
+  scale_y_discrete(
+    name = "Metric",
+    breaks = rev(metrics),
+    limits = rev(metrics),
+    labels = rev(metric.labels)
+  ) +
+  scale_x_discrete(
+    name = "Method",
+    breaks = c("approx", "pseudo", "frechet"),
+    limits = c("approx", "pseudo", "frechet"),
+    labels = c("approximate ESS", "pseudo ESS", "Frechet correlation ESS")
+  ) +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+  
+
 postfix = ifelse(pres, "_pres", "")
 
 my_ggsave(ess.comb.weevil.p, paste0("plots/ess_comb_weevil", postfix, ".pdf"), width = 6, height = 3)
@@ -455,3 +512,4 @@ my_ggsave(ess.comb.emp.finer.p, paste0("plots/ess_comb_emp_finer", postfix, ".pd
 my_ggsave(ess.comb.toy.p, paste0("plots/ess_comb_toy", postfix, ".pdf"))
 my_ggsave(ess.comb.nni.p, paste0("plots/ess_comb_nni", postfix, ".pdf"), width = ifelse(pres, 3, 9), height = ifelse(pres, 10.66, 5.33))
 my_ggsave(ess.comb.spr.p, paste0("plots/ess_comb_spr", postfix, ".pdf"), width = ifelse(pres, 3, 9), height = ifelse(pres, 10.66, 5.33))
+my_ggsave(ess.sum.emp.p, paste0("plots/ess_sum_emp", postfix, ".pdf"), width = 6, height = 6)
